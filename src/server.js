@@ -1,8 +1,19 @@
+const express = require("express")
+const app = express()
+const http = require("http")
 require("dotenv").config()
-const sequelize = require("./config/db")
+const logger = require("./utils/logger")
+const authRoutes = require("./router/login.router")
+const { sequelize } = require("./models")
 
 
 
+app.use(express.json())
+const server = http.createServer(app)
+
+app.use(authRoutes(logger))
+
+const port = process.env.PORT || 4000
 
 const start = async () => {
     try {
@@ -10,10 +21,16 @@ const start = async () => {
         await sequelize.authenticate()
         console.log("mysql database connected successfully")
         // creating a table or column 
-        await sequelize.sync({ alter: true })
+        await sequelize.sync()
         console.log("all table are created in DB")
+        server.listen(port, () => {
+            console.log(`Server is running on ${port}`);
+
+        })
+
     } catch (error) {
         console.error(error.message)
     }
 }
 start()
+

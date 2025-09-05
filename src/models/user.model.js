@@ -31,6 +31,10 @@ module.exports = (sequelize) => {
             type: DataTypes.BOOLEAN, defaultValue: false
         },
     }, {
-        tableName: "Users"
+        tableName: "Users",
+        indexes: [
+            { unique: true, fields: ["email"] },
+            { unique: true, fields: ["phone"] }
+        ]
     })
 }
