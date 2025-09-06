@@ -11,24 +11,30 @@ module.exports = (sequelize) => {
             type: DataTypes.INTEGER, allowNull: false
         },
         senderId: {
-            type: DataTypes.INTEGER, allowNull: false
+            type: DataTypes.INTEGER, allowNull: true
         },
-        message: {
-            type: DataTypes.INTEGER, allowNull: false
+        type: {
+            type: DataTypes.ENUM("text", "image", "document", "location", "contact"), allowNull: false, defaultValue: "text"
         },
-        status: {
-            type: DataTypes.ENUM("sent", "delivered", "read"), defaultValue: "sent"
+        encryptedContent: {
+            type: DataTypes.TEXT("long"), allowNull: true
         },
-        sendAt: {
-            type: DataTypes.DATE, defaultValue: DataTypes.NOW
+        iv: {
+            type: DataTypes.STRING(64), allowNull: true
         },
-        deliveredAt: {
-            type: DataTypes.DATE, allowNull: true
+        metadata: {
+            type: DataTypes.JSON, allowNull: true
         },
-        readAt: {
+        isEdited: {
+            type: DataTypes.BOOLEAN, defaultValue: false
+        },
+        deletedAt: {
             type: DataTypes.DATE, allowNull: true
         }
+
     }, {
-        tableName: "Messages"
+        tableName: "Messages",
+        timestamps: true,
+        indexes: [{ fields: ["chatId"] }, { fields: ["senderId"] }]
     })
 }

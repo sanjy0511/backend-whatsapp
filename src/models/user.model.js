@@ -6,34 +6,29 @@ module.exports = (sequelize) => {
         id: {
             type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true
         },
-        name: {
-            type: DataTypes.STRING, allowNull: false
-        },
-        email: {
-            type: DataTypes.STRING, unique: true, allowNull: true
-        },
         phone: {
-            type: DataTypes.STRING, unique: true, allowNull: true
+            type: DataTypes.STRING(32), unique: true, allowNull: false
         },
-        password: {
-            type: DataTypes.STRING, allowNull: false
+        name: {
+            type: DataTypes.STRING(100), allowNull: true
         },
-        profilePic: {
-            type: DataTypes.STRING, allowNull: true
+
+        avatar: {
+            type: DataTypes.STRING(255), allowNull: true
         },
-        statusMessage: {
-            type: DataTypes.STRING, allowNull: true, defaultValue: "Hey I'm using whatsapp"
+        about: {
+            type: DataTypes.STRING(255), allowNull: true, defaultValue: "Hey I'm using whatsapp"
         },
         lastSeen: {
             type: DataTypes.DATE, allowNull: true
         },
-        isOnline: {
+        isActive: {
             type: DataTypes.BOOLEAN, defaultValue: false
         },
     }, {
         tableName: "Users",
+        timestamps: true,
         indexes: [
-            { unique: true, fields: ["email"] },
             { unique: true, fields: ["phone"] }
         ]
     })

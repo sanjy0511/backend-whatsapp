@@ -7,12 +7,17 @@ module.exports = (sequelize) => {
             type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true
         },
         type: {
-            type: DataTypes.ENUM("private", "group"), allowNull: false
+            type: DataTypes.ENUM("direct", "group"), allowNull: false, defaultValue: "direct"
         },
-        createdBy: {
-            type: DataTypes.INTEGER, allowNull: false
+        metadata: {
+            type: DataTypes.JSON, allowNull: true
+        },
+        lastMessageId: {
+            type: DataTypes.INTEGER, allowNull: true
         }
     }, {
-        tableName: "Chats"
+        tableName: "Chats",
+        timestamps: true,
+        indexes: [{ fields: ["type"] }]
     })
 }

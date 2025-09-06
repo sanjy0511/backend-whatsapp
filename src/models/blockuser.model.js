@@ -7,13 +7,20 @@ module.exports = (sequelize) => {
             type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true
 
         },
-        userId: {
+        ownerUserId: {
             type: DataTypes.INTEGER, allowedNull: false
         },
         blockedUserId: {
             type: DataTypes.INTEGER, allowedNull: false
         }
     }, {
-        tableName: "blockedUsers"
+        tableName: "blockedUsers",
+        timestamps: true,
+        indexes: [{ fields: ["ownerUserId"] }, { fields: ["blockedUserId"] }],
+        uniqueKeys: {
+            unique_block: {
+                fields: ["ownerUserId", "blockedUserId"]
+            }
+        }
     })
 }

@@ -5,13 +5,18 @@ module.exports = (sequelize) => {
         id: {
             type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true
         },
-        userId: {
+        ownerUserId: {
             type: DataTypes.INTEGER, allowNull: false
         },
-        contactId: {
-            type: DataTypes.INTEGER, allowNull: false
+        contactPhone: {
+            type: DataTypes.STRING(32)
+        },
+        contactName: {
+            type: DataTypes.STRING(100), allowNull: true
         }
     }, {
-        tableName: "Contacts"
+        tableName: "Contacts",
+        timestamps: true,
+        indexes: [{ fields: ["ownerUserId"] }, { fields: ["contactPhone"] }]
     })
 }

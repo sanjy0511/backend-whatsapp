@@ -3,7 +3,8 @@ const app = express()
 const http = require("http")
 require("dotenv").config()
 const logger = require("./utils/logger")
-const authRoutes = require("./router/login.router")
+const authRoutes = require("./router/auth.router")
+const userRoutes = require("./router/user.router")
 const { sequelize } = require("./models")
 
 
@@ -12,6 +13,7 @@ app.use(express.json())
 const server = http.createServer(app)
 
 app.use(authRoutes(logger))
+app.use(userRoutes(logger))
 
 const port = process.env.PORT || 4000
 
