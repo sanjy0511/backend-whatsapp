@@ -26,7 +26,7 @@ const start = async () => {
         await sequelize.sync()
         console.log("all table are created in DB")
         server.listen(port, () => {
-            console.log(`Server is running on ${port}`);
+            console.log(`Server is running on http://localhost:${port}`);
 
         })
 

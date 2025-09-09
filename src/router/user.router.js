@@ -6,10 +6,12 @@ module.exports = (logger) => {
     const router = express.Router()
 
 
-    const { getProfile } = require("../controllers/user.controller")(logger)
+    const { getProfile, updateProfile, blockedUser } = require("../controllers/user.controller")(logger)
 
 
     router.get("/getprofile", verifytoken, getProfile)
+    router.patch("/updateprofile", verifytoken, updateProfile)
+    router.post("/blockuser", verifytoken, blockedUser)
 
 
     return router

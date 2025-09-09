@@ -15,7 +15,7 @@ module.exports = (logger) => {
             const otp = generateOtpCode()
             OtpStore[phone] = { otp }
             await sendSmsOtp(phone, otp)
-            res.json({ success: true, message: "Otp send to Mobile" })
+            res.json({ success: true, otp, message: "Otp send to Mobile" })
         } catch (error) {
             res.status(500).json({ Error: error.message })
         }
