@@ -1,6 +1,6 @@
 const { Message, User, Chat } = require("../models")
 const kafka = require("../config/kafka")
-const readline = require("../utils/encryption")
+const readline = require("../utils/readline")
 const { encrypt, decrypt } = require("../utils/encryption")
 const { text } = require("express")
 
@@ -14,7 +14,7 @@ module.exports = () => {
             const message = await Message.create({
                 chatId,
                 senderId: userId,
-                content: encryptedText
+                encryptedContent: encryptedText
             })
             await kafka.producer.send({
                 topic: "message",
@@ -51,7 +51,7 @@ module.exports = () => {
             })
             const decrypted = messages.map((m) => ({
                 ...m.toJSON(),
-                content: decrypt(m.content)
+                encryptedContent: decrypt(m.content)
             }))
             res.json({
                 success: true, messages: decrypted
@@ -66,24 +66,30 @@ module.exports = () => {
     }
 
     const setupTerminalMessage = (io) => {
-        readline.onMessage(async (text) => {
-            const userId = 1
-            const chatId = 1
-            const encryptedText = encrypt(text)
-            const message = await Message.create({
-                chatId,
-                senderId: userId,
-                content: encryptedText
-            })
-            io.to(chatId.toString()).emit("newMessage", {
-                id: message.id,
-                chatId,
-                senderId: userId,
-                content: text,
-                createdAt: message.createdAt
-            })
-            console.log(`Terminal Message sent -> ${text}`)
-        })
+        readline.onMessage(async ({ chatId, senderId, message }) => {
+            try {
+                const encryptedText = encrypt(message);
+
+                const msg = await Message.create({
+                    chatId,
+                    senderId,
+                    encryptedContent: encryptedText,
+                });
+
+                // Emit to all chat members
+                io.to(chatId.toString()).emit("newMessage", {
+                    id: msg.id,
+                    chatId,
+                    senderId,
+                    encryptedContent: message, // decrypted for display
+                    createdAt: msg.createdAt,
+                });
+
+                console.log(`Terminal → Chat ${chatId}, User ${senderId}: ${message}`);
+            } catch (err) {
+                console.error("Error sending terminal message:", err.message);
+            }
+        });
     }
 
 

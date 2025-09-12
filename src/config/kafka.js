@@ -1,6 +1,4 @@
 const { Kafka } = require("kafkajs")
-const { Json } = require("sequelize/lib/utils")
-const { log } = require("winston")
 
 
 const kafka = new Kafka({

@@ -5,7 +5,7 @@ module.exports = () => {
 
     const addContact = async (req, res) => {
         try {
-            const { } = req.body
+            const { phone } = req.body
             const userId = req.user.id
 
             const existingUser = await User.findOne({ where: { phone } })
@@ -40,6 +40,7 @@ module.exports = () => {
                 where: { ownerId: userId },
                 include: [{ model: User, as: "contactUser", attributes: ["id", "phone", "name"] }]
             })
+            if (!contacts) res.status(404).json({ message: "No contacts" })
             res.json({
                 success: true,
                 contacts

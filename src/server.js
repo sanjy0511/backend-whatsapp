@@ -1,7 +1,9 @@
 const express = require("express")
 const app = express()
 const http = require("http")
-require("dotenv").config()
+require("dotenv").config();
+const { Server } = require("socket.io")
+const { startReadline } = require("./utils/readline")
 const logger = require("./utils/logger")
 const authRoutes = require("./router/auth.router")
 const userRoutes = require("./router/user.router")
@@ -11,6 +13,14 @@ const { sequelize } = require("./models")
 
 app.use(express.json())
 const server = http.createServer(app)
+
+const io = new Server(server, {
+    cors: {
+        origin: "*"
+    }
+})
+
+startReadline(io)
 
 app.use(authRoutes(logger))
 app.use(userRoutes(logger))
