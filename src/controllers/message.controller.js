@@ -2,7 +2,7 @@ const { Message, User, Chat } = require("../models")
 const kafka = require("../config/kafka")
 const readline = require("../utils/readline")
 const { encrypt, decrypt } = require("../utils/encryption")
-const { text } = require("express")
+
 
 
 module.exports = () => {
@@ -10,16 +10,17 @@ module.exports = () => {
         try {
             const { chatId, content } = req.body
             const userId = req.user.id
-            const encryptedText = encrypt(content)
+
+            if (!chatId || !content) return res.status.json({ Message: "chatId and content is required" })
+
+            const { iv, encryptedData } = encrypt(content)
             const message = await Message.create({
                 chatId,
                 senderId: userId,
-                encryptedContent: encryptedText
+                encryptedContent: encryptedData,
+                iv
             })
-            await kafka.producer.send({
-                topic: "message",
-                messages: [{ value: JSON.stringify({ chatId, senderId: userId, content }) }]
-            })
+            await kafka.sendToKafka("message", { chatId, senderId: userId, content })
             req.io.to(chatId.toString()).emit("newMessage", {
                 id: message.id,
                 chatId,
@@ -46,12 +47,12 @@ module.exports = () => {
             const { chatId } = req.params
             const messages = await Message.findAll({
                 where: { chatId },
-                include: [{ model: User, as: "sender", attributes: ["id", "name", "photo"] }],
+                include: [{ model: User, as: "sender", attributes: ["id", "name", "avatar"] }],
                 order: [["createdAt", "ASC"]]
             })
             const decrypted = messages.map((m) => ({
                 ...m.toJSON(),
-                encryptedContent: decrypt(m.content)
+                decryptedContent: decrypt(m.iv, m.encryptedContent)
             }))
             res.json({
                 success: true, messages: decrypted
@@ -68,12 +69,24 @@ module.exports = () => {
     const setupTerminalMessage = (io) => {
         readline.onMessage(async ({ chatId, senderId, message }) => {
             try {
-                const encryptedText = encrypt(message);
+                const chat = await Chat.findByPk(chatId)
+                if (!chat) {
+                    console.error(`chats ${chatId} does not exists`)
+                    return
+                }
+                const user = await User.findByPk(senderId)
+                if (!user) {
+                    console.error(`user ${senderId} does not exist`)
+                    return
+                }
+
+                const { iv, encryptedData } = encrypt(message);
 
                 const msg = await Message.create({
                     chatId,
                     senderId,
-                    encryptedContent: encryptedText,
+                    encryptedContent: encryptedData,
+                    iv
                 });
 
                 // Emit to all chat members
@@ -81,7 +94,7 @@ module.exports = () => {
                     id: msg.id,
                     chatId,
                     senderId,
-                    encryptedContent: message, // decrypted for display
+                    content: message, // decrypted for display
                     createdAt: msg.createdAt,
                 });
 

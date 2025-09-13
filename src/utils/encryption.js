@@ -2,7 +2,7 @@ const crypto = require("crypto")
 
 
 
-const SECRET_KEY = 12345678901234567890123456789012
+const SECRET_KEY = "12345678901234567890123456789012"
 const ALGORITHM = "aes-256-cbc"
 
 
@@ -13,7 +13,7 @@ function encrypt(text) {
     encrypted += cipher.final("hex")
     return {
         iv: iv.toString("hex"),
-        encryptData: encrypt
+        encryptedData: encrypt
     }
 }
 

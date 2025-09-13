@@ -1,4 +1,4 @@
-const { Kafka } = require("kafkajs")
+const { Kafka, Partitioners } = require("kafkajs")
 
 
 const kafka = new Kafka({
@@ -6,8 +6,10 @@ const kafka = new Kafka({
     brokers: ["localhost:9092"]
 })
 
-const producer = kafka.producer()
-const consumer = kafka.consumer({ groupId: "whatsapp-clone-messages" })
+const producer = kafka.producer({
+    createPartitioner: Partitioners.LegacyPartitioner
+})
+const consumer = kafka.consumer({ groupId: "chat-group" })
 
 async function initKafka() {
     try {

@@ -1,6 +1,9 @@
 const readline = require("readline");
 const { encrypt } = require("./encryption");
+const EventEmitter = require("events")
 
+
+const emitter = new EventEmitter()
 function startReadline(io) {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -21,7 +24,9 @@ function startReadline(io) {
         }
 
         const [chatId, senderId, ...msgParts] = parts;
-        const message = msgParts.join(":");
+        const message = msgParts.join(":").toString();
+
+        emitter.emit("message", { chatId, senderId, message })
 
         const { iv, encryptedData } = encrypt(message);
 
@@ -37,4 +42,8 @@ function startReadline(io) {
     });
 }
 
-module.exports = { startReadline };
+function onMessage(callback) {
+    emitter.on("message", callback)
+}
+
+module.exports = { startReadline, onMessage };
