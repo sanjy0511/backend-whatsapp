@@ -9,6 +9,10 @@ module.exports = (sequelize) => {
         type: {
             type: DataTypes.ENUM("direct", "group"), allowNull: false, defaultValue: "direct"
         },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         metadata: {
             type: DataTypes.JSON, allowNull: true
         },

@@ -8,10 +8,10 @@ module.exports = (sequelize) => {
 
         },
         ownerUserId: {
-            type: DataTypes.INTEGER, allowedNull: false
+            type: DataTypes.INTEGER, allowNull: false
         },
         blockedUserId: {
-            type: DataTypes.INTEGER, allowedNull: false
+            type: DataTypes.INTEGER, allowNull: false
         }
     }, {
         tableName: "blockedUsers",

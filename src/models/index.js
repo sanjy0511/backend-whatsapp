@@ -18,7 +18,7 @@ Contact.belongsTo(User, { foreignKey: "ownerUserId", as: "owner" })
 User.hasMany(BlockedUser, { foreignKey: "ownerUserId", as: "blocked", onDelete: "CASCADE" })
 BlockedUser.belongsTo(User, { foreignKey: "ownerUserId", as: "owner" })
 
-BlockedUser.belongsTo(User, { foreignKey: "blockedUserId", as: "blockedUser" })
+BlockedUser.belongsTo(User, { foreignKey: "blockedUserId", as: "blockedAccount" })
 
 Chat.hasMany(Chatmember, { foreignKey: "chatId", as: "members", onDelete: "CASCADE" })
 Chatmember.belongsTo(Chat, { foreignKey: "chatId", as: "chat" })

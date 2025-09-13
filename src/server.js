@@ -26,6 +26,26 @@ const io = new Server(server, {
     }
 })
 
+app.use((req, res, next) => {
+    req.io = io
+    next()
+})
+
+io.on("connection", (socket) => {
+    console.log("New client connected", socket.id);
+
+    socket.on("joinChat", (chatId) => {
+        socket.join(chatId.toString())
+        console.log(`user joined chat room from ${chatId}`);
+
+    })
+    socket.on("disconnect", () => {
+        console.log("client disconnected", socket.id);
+
+    })
+
+})
+
 
 const kafkaStart = async () => {
     await initKafka()

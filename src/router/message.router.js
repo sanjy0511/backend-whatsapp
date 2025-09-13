@@ -9,7 +9,7 @@ module.exports = (logger) => {
     const { sendMessage, getMessages } = require("../controllers/message.controller")(logger)
 
     router.post("/sendmessage", verifytoken, sendMessage)
-    router.get("/getmessage", verifytoken, getMessages)
+    router.get("/:id/getmessage", verifytoken, getMessages)
 
     return router
 }

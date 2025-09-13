@@ -8,18 +8,23 @@ const { encrypt, decrypt } = require("../utils/encryption")
 module.exports = () => {
     const sendMessage = async (req, res) => {
         try {
+            const userId = req.user?.id
+
             const { chatId, content } = req.body
-            const userId = req.user.id
 
             if (!chatId || !content) return res.status.json({ Message: "chatId and content is required" })
 
-            const { iv, encryptedData } = encrypt(content)
+            const { iv, encryptedData } = encrypt(content);
+
+            console.log("EncryptedData about to save:", encryptedData); // should be a hex string
+            console.log("IV about to save:", iv);
             const message = await Message.create({
                 chatId,
                 senderId: userId,
-                encryptedContent: encryptedData,
-                iv
-            })
+                encryptedContent: encryptedData, // keep as string
+                iv // keep as string
+            });
+
             await kafka.sendToKafka("message", { chatId, senderId: userId, content })
             req.io.to(chatId.toString()).emit("newMessage", {
                 id: message.id,
@@ -44,27 +49,28 @@ module.exports = () => {
 
     const getMessages = async (req, res) => {
         try {
-            const { chatId } = req.params
+            const { id } = req.params;
             const messages = await Message.findAll({
-                where: { chatId },
+                where: { chatId: id },
                 include: [{ model: User, as: "sender", attributes: ["id", "name", "avatar"] }],
                 order: [["createdAt", "ASC"]]
-            })
-            const decrypted = messages.map((m) => ({
-                ...m.toJSON(),
-                decryptedContent: decrypt(m.iv, m.encryptedContent)
-            }))
-            res.json({
-                success: true, messages: decrypted
-            })
+            });
+            // console.log(messages);
 
+
+            const decrypted = messages.map(m => {
+                console.log("Decrypting:", m.encryptedContent.slice(0, 20) + "...", "IV:", m.iv);
+                return {
+                    ...m.toJSON(),
+                    decryptedContent: decrypt(m.encryptedContent, m.iv)
+                };
+            });
+
+            res.json({ success: true, messages: decrypted });
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                Error: error.message
-            })
+            res.status(500).json({ success: false, Error: error.message });
         }
-    }
+    };
 
     const setupTerminalMessage = (io) => {
         readline.onMessage(async ({ chatId, senderId, message }) => {

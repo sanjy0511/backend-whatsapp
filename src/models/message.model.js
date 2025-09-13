@@ -17,10 +17,10 @@ module.exports = (sequelize) => {
             type: DataTypes.ENUM("text", "image", "document", "location", "contact"), allowNull: false, defaultValue: "text"
         },
         encryptedContent: {
-            type: DataTypes.TEXT("long"), allowNull: true
+            type: DataTypes.TEXT("long"), allowNull: false
         },
         iv: {
-            type: DataTypes.STRING(64), allowNull: true
+            type: DataTypes.STRING(32), allowNull: false
         },
         metadata: {
             type: DataTypes.JSON, allowNull: true

@@ -41,6 +41,10 @@ module.exports = () => {
         try {
             const ownerUserId = req.user.id
             const { blockedUserId } = req.body
+            const owner = await User.findByPk(ownerUserId)
+            const target = await User.findByPk(blockedUserId)
+            if (!owner || !target) return res.status(404).json({ message: "Data not found" })
+
             if (!blockedUserId) return res.status(404).json({ message: "Blockuserid is required" })
             if (ownerUserId === blockedUserId) return res.status(404).json({ message: "self block not available" })
             const [blocked, created] = await BlockedUser.findOrCreate(
@@ -78,7 +82,7 @@ module.exports = () => {
         try {
             const ownerUserId = req.user.id
             const blockUsers = await BlockedUser.findAll({
-                where: { ownerUserId }, include: [{ model: User, as: "blockUser", attributes: ["id", "phone", "name", "avatar"] }]
+                where: { ownerUserId }, include: [{ model: User, as: "blockedAccount", attributes: ["id", "phone", "name", "avatar"] }]
             })
             res.json({
                 success: true,

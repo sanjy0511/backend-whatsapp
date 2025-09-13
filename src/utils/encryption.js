@@ -13,19 +13,19 @@ function encrypt(text) {
     encrypted += cipher.final("hex")
     return {
         iv: iv.toString("hex"),
-        encryptedData: encrypt
+        encryptedData: encrypted
     }
 }
 
 
-
-function decrypt(encryptData, ivHex) {
-    const iv = Buffer.from(ivHex, "hex")
-    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(SECRET_KEY), iv)
-    let decrypted = decipher.update(encryptData, "hex", "utf-8")
-    decrypted += decipher.final("utf-8")
-    return decrypted
+function decrypt(encryptedData, ivHex) {
+    const iv = Buffer.from(ivHex, "hex");
+    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(SECRET_KEY), iv);
+    let decrypted = decipher.update(encryptedData, "hex", "utf-8");
+    decrypted += decipher.final("utf-8");
+    return decrypted;
 }
+
 
 module.exports = {
     encrypt, decrypt
