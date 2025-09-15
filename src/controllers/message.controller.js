@@ -15,9 +15,6 @@ module.exports = () => {
             if (!chatId || !content) return res.status.json({ Message: "chatId and content is required" })
 
             const { iv, encryptedData } = encrypt(content);
-
-            console.log("EncryptedData about to save:", encryptedData); // should be a hex string
-            console.log("IV about to save:", iv);
             const message = await Message.create({
                 chatId,
                 senderId: userId,
@@ -25,7 +22,7 @@ module.exports = () => {
                 iv // keep as string
             });
 
-            await kafka.sendToKafka("message", { chatId, senderId: userId, content })
+            await kafka.sendToKafka("messages", { chatId, senderId: userId, content })
             req.io.to(chatId.toString()).emit("newMessage", {
                 id: message.id,
                 chatId,
@@ -55,11 +52,7 @@ module.exports = () => {
                 include: [{ model: User, as: "sender", attributes: ["id", "name", "avatar"] }],
                 order: [["createdAt", "ASC"]]
             });
-            // console.log(messages);
-
-
             const decrypted = messages.map(m => {
-                console.log("Decrypting:", m.encryptedContent.slice(0, 20) + "...", "IV:", m.iv);
                 return {
                     ...m.toJSON(),
                     decryptedContent: decrypt(m.encryptedContent, m.iv)

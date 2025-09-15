@@ -55,4 +55,5 @@ module.exports = {
     Message,
     Chatmember,
     BlockedUser,
+    Media
 }

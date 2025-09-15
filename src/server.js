@@ -11,6 +11,7 @@ const userRoutes = require("./router/user.router")
 const contactRoutes = require("./router/contact.router")
 const chatRoutes = require("./router/chat.router")
 const messageRoutes = require("./router/message.router")
+const mediaRoutes = require("./router/media.router")
 const { sequelize } = require("./models");
 const { initKafka } = require("./config/kafka");
 
@@ -60,6 +61,7 @@ app.use(userRoutes(logger))
 app.use(contactRoutes(logger))
 app.use(chatRoutes(logger))
 app.use(messageRoutes(logger))
+app.use(mediaRoutes(logger))
 
 const port = process.env.PORT || 4000
 
